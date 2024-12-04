@@ -1,0 +1,19 @@
+# De-dup 2:1
+# 4K de-dupe size
+# Compression capable 2:1
+DEDUPRATIO=2
+DEDUPUNIT=4K
+COMPRATIO=2
+ 
+fsd=fsd1,anchor=/apps/data1,depth=2,width=3,files=100,size=100M
+fsd=fsd2,anchor=/apps/data2,depth=2,width=3,files=100,size=100M
+ 
+# 4 workers (16 threads total)
+fwd=fwd1,fsd=fsd*,xfersize=4k,fileio=random,fileselect=random,threads=4
+fwd=fwd2,fsd=fsd*,xfersize=128k,fileio=random,fileselect=random,threads=4
+fwd=fwd3,fsd=fsd*,xfersize=(1024k,20,128k,50,4k,30),fileio=random,fileselect=random,threads=4
+fwd=fwd4,fsd=fsd*,xfersize=1024k,fileio=sequential,fileselect=random,threads=4
+ 
+#rd=rd1,fwd=fwd*,fwdrate=max,format=yes,elapsed=120,interval=1
+#rd=rd1,fwd=fwd*,fwdrate=max,format=yes,operations=(read,write),elapsed=3600,interval=1
+rd=rd1,fwd=fwd*,fwdrate=max,format=no,warmup=10,operations=(read,write),elapsed=3600,interval=1
